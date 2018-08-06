@@ -31,15 +31,16 @@ install_nodejs() {
   local dir="$2"
 
   echo "Resolving node version $version..."
-  if ! read number url < <(curl --silent --get --connect-timeout $CURL_CONNECT_TIMEOUT --max-time $CURL_TIMEOUT --data-urlencode "range=$version" "https://nodebin.herokai.com/v1/node/$platform/latest.txt"); then
+  if ! read number url < <(curl  --get --connect-timeout $CURL_CONNECT_TIMEOUT --max-time $CURL_TIMEOUT --data-urlencode "range=$version" "https://nodebin.herokai.com/v1/node/$platform/latest.txt"); then
     fail_bin_install node $version;
   fi
 
   echo "Downloading and installing node $number..."
-  local code=$(curl "$url" -L --silent --fail --connect-timeout $CURL_CONNECT_TIMEOUT --max-time $CURL_TIMEOUT -o /tmp/node.tar.gz --write-out "%{http_code}")
+  local code=$(curl "$url" -L --fail --connect-timeout $CURL_CONNECT_TIMEOUT --max-time $CURL_TIMEOUT -o /tmp/node.tar.gz --write-out "%{http_code}")
   if [ "$code" != "200" ]; then
     echo "Unable to download node: $code" && false
   fi
+  ls -alh /tmp/node.tar.gz
   tar xzf /tmp/node.tar.gz -C /tmp
   rm -rf $dir/*
   mv /tmp/node-v$number-$os-$cpu/* $dir
